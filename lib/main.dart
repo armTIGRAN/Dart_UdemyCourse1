@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
-import "./question.dart";
-import './answer.dart';
+import "./quiz.dart";
+import './result.dart';
+import './intro.dart';
 // void main(){
 //   runApp(MyApp());
 // }
@@ -16,61 +17,104 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  static const questions = [
+  static const _questions = [
     {
       "QuestionText": "What's your favourite color?",
-      "answers": ["blue", "red", "purple", "green"]
+      "answers": [
+        {"text": "red", "score": 5},
+        {"text": "purple", "score": 3},
+        {"text": "green", "score": 1},
+        {"text": "blue", "score": 10}
+      ]
     },
     {
       "QuestionText": "What's your favourite animal?",
-      "answers": ["dog", "cat", "elephant", "zebre", "pig"]
+      "answers": [
+        {"text": "cat", "score": 5},
+        {"text": "zebre", "score": 10},
+        {"text": "dog", "score": 1},
+        {"text": "lion", "score": 3}
+      ]
     },
     {
       "QuestionText": "What's your favourite film?",
-      "answers": ["avengers", "avatar", "survived"]
+      "answers": [
+        {"text": "Avatar", "score": 1},
+        {"text": "Man x", "score": 5},
+        {"text": "Survived", "score": 3},
+        {"text": "Avengers", "score": 10}
+      ]
     },
     {
       "QuestionText": "What's your favourite game?",
-      "answers": ["minecraft", "csgo", "pubg", 'forest', 'assasin\'s creed']
+      "answers": [
+        {"text": "pubg", "score": 5},
+        {"text": "forest", "score": 3},
+        {"text": "assasin's creed", "score": 1},
+        {"text": "minecraft", "score": 10}
+      ]
     }
   ];
 
-  int _questionIndex = 0;
+  var _questionIndex = 0;
+  var _totalScore = 0;
+  bool _startState = false;
 
-  void _answerQuestion() {
-    print(_questionIndex);
-    // print(questions.length);
+  void _start() {
+    setState(() {
+      _startState = true;
+    });
+  }
+
+  void _answerQuestion(int score) {
+    _totalScore = _totalScore + score;
+
     setState(() {
       _questionIndex += 1;
     });
-    print("Answer chosen");
-    if (_questionIndex >= questions.length) {
+
+    if (_questionIndex >= _questions.length) {
       print("No more questions");
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    var answers;
-    if (_questionIndex < questions.length) {
-      answers = questions[_questionIndex]["answers"] as List;
-    }
+  void _resetQuiz() {
+    setState(() {
+      _questionIndex = 0;
+      _totalScore = 0;
+    });
+  }
 
+  @override
+  // Widget build(BuildContext context) {
+  //   return MaterialApp(
+  //     home: Scaffold(
+  //       appBar: AppBar(
+  //         title: Text("My First App"),
+  //       ),
+  //       body: _questionIndex < _questions.length
+  //           ? Quiz(
+  //               answerQuestion: _answerQuestion,
+  //               questionIndex: _questionIndex,
+  //               questions: _questions)
+  //           : Result(_totalScore, _resetQuiz),
+  //     ),
+  //   );
+  // }
+  Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(
-          title: Text("My First App"),
-        ),
-        body: _questionIndex < questions.length
-            ? Column(
-                children: <Widget>[
-                  Question(questions[_questionIndex]["QuestionText"]),
-                  for (var i = 0; i < answers.length; i++)
-                    Answer(_answerQuestion, answers[i])
-                ],
-              )
-            : Center(child: Text("You did it!")),
-      ),
+          appBar: AppBar(
+            title: Text("My First App", style: TextStyle(fontSize: 24)),
+          ),
+          body: _startState == true
+              ? _questionIndex < _questions.length
+                  ? Quiz(
+                      answerQuestion: _answerQuestion,
+                      questionIndex: _questionIndex,
+                      questions: _questions)
+                  : Result(_totalScore, _resetQuiz)
+              : Intro(_start)),
     );
   }
 }
